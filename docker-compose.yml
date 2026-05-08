@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+
+  api:
+    build: .
+
+    container_name: fastapi_app
+
+    restart: always
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+
+    depends_on:
+      - mysql
+
+    env_file:
+      - .env
+
+    command: >
+      sh -c "
+      alembic upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  mysql:
+    image: mysql:8.0
+
+    container_name: mysql_db
+
+    restart: always
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: test_db
+
+    command: --default-authentication-plugin=mysql_native_password
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+
+    container_name: phpmyadmin
+
+    restart: always
+
+    depends_on:
+      - mysql
+
+    ports:
+      - "8080:80"
+
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: 123456
+
+volumes:
+  mysql_data:
