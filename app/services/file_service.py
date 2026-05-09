@@ -9,7 +9,7 @@ ALLOWED_EXTENSIONS = ["mp3", "wav"]
 
 
 def generate_file_token():
-    return secrets.token_hex(32)
+    return secrets.token_hex(8)
 
 
 async def save_uploaded_file(file: UploadFile):
